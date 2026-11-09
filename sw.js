@@ -1,6 +1,6 @@
 /* 减脂台 Service Worker · 离线缓存
    策略：页面导航 → 网络优先、失败回落缓存；静态资源 → 缓存优先 */
-var CACHE = "fl-wb-v4";
+var CACHE = "fl-wb-v5";
 var CORE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
 self.addEventListener("install", function (e) {
