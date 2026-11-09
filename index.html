@@ -182,19 +182,28 @@
     .weekgrid{grid-template-columns:repeat(2,1fr)}
     .daycard{min-height:0}
   }
-  /* ---------- 动作组数表单（手机紧凑网格）---------- */
+  /* ---------- 今日训练打卡（多动作批量生成卡片）---------- */
   .setno{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--green);background:rgba(30,70,52,.08);border-radius:6px;padding:3px 8px;white-space:nowrap}
   #formSets{display:grid;gap:10px;margin-top:10px}
-  #formSets .frow{display:grid;gap:10px}
+  #formSets .frow{display:grid;gap:8px}
   #formSets .frow.r1{grid-template-columns:138px 1fr}
-  #formSets .frow.r2{grid-template-columns:1fr 1fr}
   #formSets .fld{min-width:0}
-  #formSets .frow .btn{grid-column:1/-1;min-height:50px;font-size:15px}
+  .exrow{display:grid;grid-template-columns:minmax(100px,1fr) 54px 54px 68px 34px;gap:6px;align-items:center;margin-bottom:6px}
+  .exrow input{min-width:0;width:100%;padding:10px 8px;font-size:16px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-family:inherit}
+  .exrow .ex-del{min-width:34px;min-height:44px;border:none;background:transparent;color:var(--ink2);font-size:20px;line-height:1;cursor:pointer;border-radius:8px;padding:0}
+  .exbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .exbtns .btn{min-height:50px;font-size:15px}
+  .setcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin:8px 0 4px}
+  .setcard{min-height:60px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--ink2);padding:6px 4px;font-family:inherit;-webkit-tap-highlight-color:transparent}
+  .setcard b{font-size:13px;color:var(--ink)}
+  .setcard.done{background:var(--green);border:1.5px solid var(--green);color:rgba(255,255,255,.85)}
+  .setcard.done b{color:#fff}
+  .setcard svg{width:18px;height:18px}
   @media (min-width:768px){
-    #formSets{grid-template-columns:150px minmax(160px,1fr) 92px 112px auto;align-items:end}
-    #formSets .frow{display:contents}
-    #formSets .frow .btn{grid-column:auto;min-height:44px;font-size:14px}
-    #formSets .hint{grid-column:1/-1}
+    .exrow{grid-template-columns:minmax(160px,1fr) 64px 64px 80px 36px}
+    .exbtns{grid-template-columns:auto auto;justify-content:start}
+    .exbtns .btn{min-height:44px;font-size:14px}
+    .setcards{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
   }
   /* ---------- App 化：全屏独立运行时给状态栏留位 ---------- */
   @media all and (display-mode: standalone){
@@ -371,33 +380,32 @@
         <div class="list" id="planList"></div>
       </details>
     </div>
-    <!-- 动作组数记录（训练明细表） -->
+    <!-- 今日训练打卡（多动作生成卡片，一组一卡） -->
     <div class="card" style="margin-top:14px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px">
-        <div style="font-weight:700;font-size:14px">动作组数记录</div>
+        <div style="font-weight:700;font-size:14px">今日训练打卡</div>
         <div style="font-size:12px;color:var(--ink2)" id="setsSummary"></div>
       </div>
       <form id="formSets">
         <div class="frow r1">
           <div class="fld"><label>日期</label><input type="date" id="xDate"></div>
-          <div class="fld"><label>动作</label>
-            <input id="xName" list="exerciseList" placeholder="如：卧推" required>
-            <datalist id="exerciseList">
-              <option value="卧推"></option><option value="上斜卧推"></option><option value="杠铃划船"></option>
-              <option value="高位下拉"></option><option value="硬拉"></option><option value="深蹲"></option>
-              <option value="腿举"></option><option value="肩推"></option><option value="侧平举"></option>
-              <option value="引体向上"></option><option value="俯卧撑"></option><option value="双杠臂屈伸"></option>
-              <option value="哑铃弯举"></option><option value="绳索下压"></option><option value="平板支撑"></option>
-              <option value="卷腹"></option><option value="保加利亚分腿蹲"></option>
-            </datalist></div>
+          <datalist id="exerciseList">
+            <option value="卧推"></option><option value="上斜卧推"></option><option value="杠铃划船"></option>
+            <option value="高位下拉"></option><option value="硬拉"></option><option value="深蹲"></option>
+            <option value="腿举"></option><option value="肩推"></option><option value="侧平举"></option>
+            <option value="引体向上"></option><option value="俯卧撑"></option><option value="双杠臂屈伸"></option>
+            <option value="哑铃弯举"></option><option value="绳索下压"></option><option value="平板支撑"></option>
+            <option value="卷腹"></option><option value="保加利亚分腿蹲"></option>
+          </datalist>
         </div>
-        <div class="frow r2">
-          <div class="fld"><label>次数</label><input type="number" id="xReps" inputmode="numeric" min="1" placeholder="10"></div>
-          <div class="fld"><label>重量 kg</label><input type="number" step="0.5" id="xWeight" inputmode="decimal" placeholder="自重可空"></div>
-          <button type="submit" class="btn green" id="xCheckin">完成一组 ✓</button>
+        <div id="exRows"></div>
+        <div class="exbtns">
+          <button type="button" class="btn" id="xAddRow" style="background:var(--paper2)">＋ 添加动作</button>
+          <button type="submit" class="btn green" id="xGen">生成打卡卡</button>
         </div>
-        <div class="muted hint" style="font-size:12px">每做完一组点一次「完成一组」，自动按第 1、2、3… 组累加；次数和重量会保留，连打不用重填。</div>
+        <div class="muted hint" style="font-size:12px">上面一次填好今天要练的所有动作和组数，点「生成打卡卡」，下面每个动作生成一排卡片——练完一组点一下那张卡，就完成一组。</div>
       </form>
+      <div id="todayCards"></div>
       <div class="list" id="setsList"></div>
     </div>
     <div class="card" style="margin-top:14px">
@@ -563,16 +571,20 @@ var state={ body:[], diet:[], plan:[], log:[], sets:[], habit:[], check:[], revi
 
 function loadKey(key, fb){ try{ var raw=localStorage.getItem(key); return raw?JSON.parse(raw):fb; }catch(e){ return fb; } }
 function saveKey(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast("保存失败：存储空间不足"); } }
-// 旧版组数格式（一条记录含 sets:N）→ 迁移为「一组一条」
+// 旧版组数格式（一条记录含 sets:N）→ 迁移为「一组一条」；
+// 老版本记录没有 done 字段（练完才记），统一补 done:true
 function migrateSets(arr){
   var out=[], changed=false;
   (arr||[]).forEach(function(r){
-    if(r.setNo!=null || !(num(r.sets)>1)){ out.push(r); return; }
+    if(r.setNo!=null || !(num(r.sets)>1)){
+      if(r.setNo!=null && r.done==null){ r.done=true; changed=true; }
+      out.push(r); return;
+    }
     changed=true;
     var n=Math.min(99,Math.floor(num(r.sets)));
     for(var i=1;i<=n;i++){
       out.push({_id:r._id+"-"+i,date:r.date,exercise:r.exercise,setNo:i,
-        reps:r.reps||"",weight:(r.weight===""||r.weight==null)?"":r.weight,note:r.note||""});
+        reps:r.reps||"",weight:(r.weight===""||r.weight==null)?"":r.weight,done:true,note:r.note||""});
     }
   });
   return changed?out:(arr||[]);
@@ -617,13 +629,15 @@ function ensureSample(){
     saveKey(KEYS.log,arr3); state.log=arr3;
   }
   if(state.sets.length===0 && localStorage.getItem(KEYS.sets)===null){
-    var ty=addDays(todayStr(),-1);
+    var ty=todayStr();
     var arr8=[
-      {_id:uid(),date:ty,exercise:"卧推",setNo:1,reps:10,weight:40,note:"[示例] 演示组数"},
-      {_id:uid(),date:ty,exercise:"卧推",setNo:2,reps:10,weight:40,note:"[示例] 演示组数"},
-      {_id:uid(),date:ty,exercise:"卧推",setNo:3,reps:9,weight:42.5,note:"[示例] 演示组数"},
-      {_id:uid(),date:ty,exercise:"杠铃划船",setNo:1,reps:12,weight:35,note:"[示例] 演示组数"},
-      {_id:uid(),date:todayStr(),exercise:"自重深蹲",setNo:1,reps:15,weight:"",note:"[示例] 演示组数"}
+      {_id:uid(),date:addDays(ty,-1),exercise:"卧推",setNo:1,totalSets:3,reps:10,weight:40,done:true,note:"[示例] 演示组数"},
+      {_id:uid(),date:addDays(ty,-1),exercise:"卧推",setNo:2,totalSets:3,reps:10,weight:40,done:true,note:"[示例] 演示组数"},
+      {_id:uid(),date:addDays(ty,-1),exercise:"卧推",setNo:3,totalSets:3,reps:9,weight:42.5,done:true,note:"[示例] 演示组数"},
+      {_id:uid(),date:addDays(ty,-1),exercise:"杠铃划船",setNo:1,totalSets:1,reps:12,weight:35,done:true,note:"[示例] 演示组数"},
+      {_id:uid(),date:ty,exercise:"上斜卧推",setNo:1,totalSets:3,reps:10,weight:40,done:true,note:"[示例] 演示打卡"},
+      {_id:uid(),date:ty,exercise:"上斜卧推",setNo:2,totalSets:3,reps:10,weight:40,done:false,note:"[示例] 演示打卡"},
+      {_id:uid(),date:ty,exercise:"上斜卧推",setNo:3,totalSets:3,reps:10,weight:40,done:false,note:"[示例] 演示打卡"}
     ];
     saveKey(KEYS.sets,arr8); state.sets=arr8;
   }
@@ -968,16 +982,61 @@ function renderTrain(){
   $("habitTable").innerHTML=tHead+body;
 }
 function renderSets(){
+  renderTodayCards();
+  renderSetsHistory();
+}
+/* 今日打卡卡片区：每个动作一排卡，点一下卡 = 完成该组 */
+function renderTodayCards(){
   var t=derived.today;
-  var rows=state.sets.slice();
-  var todayRows=rows.filter(function(r){ return r.date===t; });
-  var totalSets=todayRows.length, volume=0;
+  var todayRows=state.sets.filter(function(r){ return r.date===t; });
+  var doneCnt=0, total=0, volume=0;
   todayRows.forEach(function(r){
-    var rp=num(r.reps)||0, wt=(r.weight===""||r.weight==null)?null:num(r.weight);
-    if(wt!=null) volume+=rp*wt;
+    total++;
+    if(r.done){
+      doneCnt++;
+      var rp=num(r.reps)||0, wt=(r.weight===""||r.weight==null)?null:num(r.weight);
+      if(wt!=null) volume+=rp*wt;
+    }
   });
-  $("setsSummary").textContent=todayRows.length?("今日 "+totalSets+" 组"+(volume>0?(" · 容量 "+Math.round(volume)+" kg"):"")):"今日还没有记录";
-  // 按日期倒序 → 动作（按首组出现顺序）→ 组号升序
+  $("setsSummary").textContent=total?("今日 "+doneCnt+" / "+total+" 组"+(volume>0?(" · 容量 "+Math.round(volume)+" kg"):"")):"今日还没有安排";
+  var exOrder=[], byEx={};
+  todayRows.forEach(function(r){
+    if(!byEx[r.exercise]){ byEx[r.exercise]=[]; exOrder.push(r.exercise); }
+    byEx[r.exercise].push(r);
+  });
+  var html="";
+  exOrder.forEach(function(ex){
+    var list=byEx[ex].sort(function(a,b){ return (num(a.setNo)||0)-(num(b.setNo)||0); });
+    var d=list.filter(function(r){ return r.done; }).length;
+    var first=list[0]||{};
+    var load=(first.weight!==""&&first.weight!=null&&num(first.weight)!=null)?fmt1(num(first.weight))+"kg":"自重";
+    var cards="";
+    list.forEach(function(r){
+      var rp=esc(r.reps||"--");
+      var sub=rp+" 次"+((r.weight!==""&&r.weight!=null&&num(r.weight)!=null)?(" · "+fmt1(num(r.weight))+"kg"):"");
+      if(r.done){
+        cards+='<button class="setcard done" data-set="'+esc(r._id)+'" aria-label="点击取消第 '+(num(r.setNo)||1)+' 组">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>'+
+          '<b>第 '+(num(r.setNo)||1)+' 组</b><span>'+sub+'</span></button>';
+      }else{
+        cards+='<button class="setcard" data-set="'+esc(r._id)+'" aria-label="点击完成第 '+(num(r.setNo)||1)+' 组">'+
+          '<b>第 '+(num(r.setNo)||1)+' 组</b><span>'+sub+'</span></button>';
+      }
+    });
+    html+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0 0;flex-wrap:wrap">'+
+      '<span class="tag">'+esc(ex)+'</span>'+(isSample(first.note)?'<span class="tag sample">示例</span>':"")+
+      '<span class="muted" style="font-size:12px">'+d+' / '+list.length+' 组 · '+load+'</span>'+
+      '<button class="iconbtn" data-clex="'+esc(t)+"|"+esc(ex)+'" style="margin-left:auto" aria-label="清空该动作的打卡卡"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg></button></div>'+
+      '<div class="setcards">'+cards+'</div>';
+  });
+  $("todayCards").innerHTML=todayRows.length?html:
+    '<div class="empty" style="margin-top:8px">今天还没生成打卡卡——在上面填好动作和组数，点「生成打卡卡」。</div>';
+}
+/* 历史记录区：今天之前的已完成明细 */
+function renderSetsHistory(){
+  var t=derived.today;
+  var rows=state.sets.filter(function(r){ return r.date<t; });
+  if(!rows.length){ $("setsList").innerHTML=""; return; }
   var dates={}, order=[];
   rows.forEach(function(r){
     if(!dates[r.date]){ dates[r.date]=[]; order.push(r.date); }
@@ -1010,12 +1069,12 @@ function renderSets(){
       blockHtml+='<div style="display:flex;align-items:center;gap:8px;margin:8px 0 2px"><span class="tag">'+esc(ex)+'</span><span class="muted" style="font-size:12px">'+list.length+' 组</span></div>'+rowsHtml;
     });
     if(!blockHtml) return;
-    html+='<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:10px 0 2px">'+esc(d)+(d===t?' <span class="tag">今天</span>':"")+'</div>'+blockHtml;
+    html+='<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:10px 0 2px">'+esc(d)+'</div>'+blockHtml;
   });
   if(rows.length>maxShow){
     html+='<div class="empty">更早的 '+(rows.length-maxShow)+' 组已折叠，可在导出 JSON 中查看全部。</div>';
   }
-  $("setsList").innerHTML=rows.length?html:'<div class="empty">还没有动作记录，练完一组点一次「完成一组」。</div>';
+  $("setsList").innerHTML=html;
 }
 function renderReview(){
   var d=derived;
@@ -1080,6 +1139,50 @@ function toggleCheck(habit,date){
   if(rec){ rec.done=!rec.done; } else { state.check.push({_id:uid(),date:date,habit:habit,done:true,note:""}); }
   saveKey(KEYS.check,state.check);
   refreshAll();
+}
+/* 把某天某动作同步为 n 张打卡卡：已完成的组保留，未完成的组按需增减 */
+function syncExerciseCards(date,name,n,reps,weight){
+  var mine=state.sets.filter(function(r){ return r.date===date&&r.exercise===name; });
+  var done=mine.filter(function(r){ return r.done; });
+  var pending=mine.filter(function(r){ return !r.done; });
+  pending.forEach(function(r){ r.reps=reps; r.weight=weight; });
+  var need=n-done.length;
+  if(need>pending.length){
+    var maxNo=0;
+    mine.forEach(function(r){ maxNo=Math.max(maxNo,num(r.setNo)||0); });
+    for(var i=0;i<need-pending.length;i++){
+      maxNo++;
+      state.sets.push({_id:uid(),date:date,exercise:name,setNo:maxNo,totalSets:n,reps:reps,weight:weight,done:false,note:""});
+    }
+  }else if(need<pending.length){
+    pending.sort(function(a,b){ return (num(b.setNo)||0)-(num(a.setNo)||0); });
+    for(var j=0;j<pending.length-need;j++){
+      var idx=state.sets.indexOf(pending[j]);
+      if(idx>=0) state.sets.splice(idx,1);
+    }
+  }
+}
+/* 点卡：完成 / 取消该组 */
+function toggleSet(id){
+  var rec=null;
+  state.sets.forEach(function(r){ if(r._id===id) rec=r; });
+  if(!rec) return;
+  rec.done=!rec.done;
+  if(rec.done){ rec.doneAt=Date.now(); } else { delete rec.doneAt; }
+  saveKey(KEYS.sets,state.sets);
+  refreshAll();
+  toast(rec.done?("第 "+(num(rec.setNo)||1)+" 组完成 · "+rec.exercise):("已取消第 "+(num(rec.setNo)||1)+" 组"));
+}
+/* 清空某天某动作的全部打卡卡 */
+function clearExerciseCards(date,name){
+  var n=state.sets.filter(function(r){ return r.date===date&&r.exercise===name; }).length;
+  if(!n) return;
+  confirmBox("清空打卡卡","将删除 "+date+" "+name+" 的全部 "+n+" 张卡（含已完成的组），确定吗？",function(){
+    state.sets=state.sets.filter(function(r){ return !(r.date===date&&r.exercise===name); });
+    saveKey(KEYS.sets,state.sets);
+    refreshAll();
+    toast("已清空 "+name+" 的打卡卡");
+  });
 }
 function logTraining(date,name,minutes){
   state.log.push({_id:uid(),date:date,name:name,minutes:minutes||40,strength:"中",burn:"",note:""});
@@ -1182,19 +1285,41 @@ function bind(){
     $("pName").value=""; $("pContent").value=""; $("pMin").value="";
     refreshAll(); toast("已加入计划");
   };
-  // 动作组数：一组一打卡
+  // 今日训练：多动作批量生成打卡卡
+  function addExRow(name,sets,reps,weight){
+    var wrap=$("exRows");
+    if(wrap.children.length>=8){ toast("最多 8 个动作"); return; }
+    var div=document.createElement("div"); div.className="exrow";
+    div.innerHTML=
+      '<input class="ex-name" list="exerciseList" placeholder="动作名" value="'+(name?esc(name):"")+'">'+
+      '<input class="ex-sets" type="number" inputmode="numeric" min="1" max="20" placeholder="组" title="组数" value="'+(sets||"")+'">'+
+      '<input class="ex-reps" type="number" inputmode="numeric" min="1" placeholder="次" title="每组次数" value="'+(reps||"")+'">'+
+      '<input class="ex-weight" type="number" step="0.5" inputmode="decimal" placeholder="kg" title="重量，自重可空" value="'+(weight||"")+'">'+
+      '<button type="button" class="ex-del" title="移除该动作" aria-label="移除该动作">×</button>';
+    div.querySelector(".ex-del").onclick=function(){ div.remove(); };
+    wrap.appendChild(div);
+    if(!name) div.querySelector(".ex-name").focus();
+  }
+  addExRow();
+  $("xAddRow").onclick=function(){ addExRow(); };
   $("formSets").onsubmit=function(e){
     e.preventDefault();
-    var n=$("xName").value.trim();
-    if(!n){ toast("动作名称必填"); $("xName").focus(); return; }
     var d=$("xDate").value||todayStr();
-    var reps=num($("xReps").value)||"";
-    var weight=$("xWeight").value===""?"":num($("xWeight").value);
-    var maxNo=0;
-    state.sets.forEach(function(r){ if(r.date===d&&r.exercise===n) maxNo=Math.max(maxNo,num(r.setNo)||0); });
-    state.sets.push({_id:uid(),date:d,exercise:n,setNo:maxNo+1,reps:reps,weight:weight,note:""});
+    var rows=[].slice.call(document.querySelectorAll("#exRows .exrow"));
+    var addedNames=[], skipped=[];
+    rows.forEach(function(row){
+      var name=row.querySelector(".ex-name").value.trim();
+      if(!name){ skipped.push("(空动作)"); return; }
+      var n=Math.min(20,Math.max(1,parseInt(row.querySelector(".ex-sets").value,10)||3));
+      var reps=num(row.querySelector(".ex-reps").value)||"";
+      var weight=row.querySelector(".ex-weight").value===""?"":num(row.querySelector(".ex-weight").value);
+      syncExerciseCards(d,name,n,reps,weight);
+      addedNames.push(name+" "+n+"组");
+    });
+    if(!addedNames.length){ toast("请至少填写一个动作名称"); return; }
     saveKey(KEYS.sets,state.sets);
-    refreshAll(); toast("第 "+(maxNo+1)+" 组已记录 · "+n);
+    refreshAll();
+    toast("已生成打卡卡："+addedNames.join("、"));
   };
   // 习惯新增
   $("formHabit").onsubmit=function(e){
@@ -1266,9 +1391,11 @@ function bind(){
   };
   // 委托事件：删除 / 打卡 / 补卡 / 跳过 / 快速记录 / tab
   document.addEventListener("click",function(e){
-    var el=e.target.closest?e.target.closest("[data-del],[data-log],[data-habit],[data-act],[data-goto]"):null;
+    var el=e.target.closest?e.target.closest("[data-del],[data-log],[data-habit],[data-act],[data-goto],[data-set],[data-clex]"):null;
     if(!el) return;
     if(el.dataset.del){ delRecord(el.dataset.del,el.dataset.id); }
+    else if(el.dataset.set){ toggleSet(el.dataset.set); }
+    else if(el.dataset.clex){ var p=el.dataset.clex.split("|"); clearExerciseCards(p[0],p.slice(1).join("|")); }
     else if(el.dataset.log){ logTraining(el.dataset.date,el.dataset.log,40); }
     else if(el.dataset.habit){ toggleCheck(el.dataset.habit,el.dataset.date); }
     else if(el.dataset.act==="quick"){ document.querySelector("#qWeight").focus(); document.querySelector("#sec-focus").scrollIntoView({behavior:"smooth"}); }
